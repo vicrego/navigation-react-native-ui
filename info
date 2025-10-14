@@ -1,0 +1,6 @@
+
+
+IMPORTANT INFO
+On Android Studio (Emulator), in order for the current location of the 
+user to be recongnized it's needed to leave the app on the simulator (swapping
+the down bar in a upper direction as when we change apps in a cellphone).

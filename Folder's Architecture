@@ -1,0 +1,18 @@
+📦 project-root/
+ ┣ 📁 app/
+ ┃ ┣ index.tsx                 # main screen
+ ┃ ┣ navigation.tsx            # optional screen
+ ┃ ┗ ...                       # other screens
+ ┣ 📁 src/
+ ┃ ┣ 📁 api/
+ ┃ ┃ ┗ mapbox.ts               # your Mapbox functions
+ ┃ ┣ 📁 components/
+ ┃ ┃ ┣ SearchComponent.tsx     # search input
+ ┃ ┃ ┗ NavigationInfo.tsx      # distance/time info box
+ ┃ ┣ 📁 hooks/
+ ┃ ┃ ┗ useLocations.ts         # location tracking hook
+ ┃ ┗ 📁 utils/
+ ┃    ┗ formatters.ts          # optional helper utilities
+ ┣ app.json
+ ┣ package.json
+ ┗ tsconfig.json
