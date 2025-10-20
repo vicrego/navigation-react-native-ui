@@ -5,21 +5,19 @@ import { Pressable, TextInput, View } from 'react-native';
 import { destinationDirection, destinationLatLng } from '../api/mapbox';
 
   
-const SearchComponent = ({publicToken, onSelect, currentLocation, setRoute, setDistance, setDuration, setPlaceName, setShortName}: any) => {
+const SearchComponent = ({publicToken, onSelect, currentLocation, setRoute, setDistance, setDuration, setDestinationCoords, setPlaceName, setShortName}: any) => {
 
   const [query, setQuery] = useState("");
-  const [distanceInMiles, setDistanceInMiles] = useState();
 
+  //SearchComponent, when triggered, updates every state that's based on the user's destination
   const handleSearch = async () => {
     if (!query) return;
       const destinationReverse = await destinationLatLng({query, publicToken});
       const [destLng, destLat] = destinationReverse?.coordinates;
-      console.log("destinationReverse: ", destinationReverse)
       const {routeGeometry, distanceInMiles, durationInMinutes}: any = await destinationDirection({currentLocation, destLng, destLat, publicToken});
-      //const {routeGeometry, distanceInMiles, durationInMinutes}: any = destinationForward;
-      console.log("routeGeometry: ", routeGeometry)
       setPlaceName(destinationReverse?.placeName);
       setShortName(destinationReverse?.shortName);
+      setDestinationCoords({latitude: destLng, longitude: destLat});
       setDistance(distanceInMiles);
       setDuration(durationInMinutes);
       setRoute(routeGeometry);

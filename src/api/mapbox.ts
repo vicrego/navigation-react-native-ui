@@ -18,7 +18,6 @@ export const destinationLatLng = async ({query, publicToken}: any) => {
             console.warn("No results found for query:", query);
             return null;
         }
-        console.log("response", response);
 
         const feature = response.data.features[0];
         const {coordinates}  = feature.geometry;
@@ -48,7 +47,8 @@ export const destinationDirection = async ({currentLocation, destLng, destLat, p
         const routeGeometry = response.data.routes[0].geometry;
         const distanceInMiles = (response.data.routes[0].distance / 1609.34).toFixed(2);
         const durationInMinutes = (response.data.routes[0].duration / 60).toFixed(1);
-        
+        //console.log("distance Mapbox:", response.data.routes[0].legs)
+        console.log("distanceInMiles:", distanceInMiles)
         if (!routeGeometry) {
             console.warn("Nenhuma rota encontrada para o destino.");
             return null;

@@ -5,10 +5,11 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 
 
-const NavigationInfo = ({distance, duration, placeName, shortName}: any) => {
-
+const NavigationInfo = ({distance, duration, placeName, shortName, currentDistance}: any) => {    
+    //Nav Info simply displays navigation Info to the user
+    let remainingMeters = currentDistance.remainingMeters.toFixed(2);
+    console.log("remains Info", currentDistance.snappedPoint);
     const fadeAnim = useRef(new Animated.Value(0)).current;
-
     const fadeIn = () => {
     // Will change fadeAnim value to 1 in 5 seconds
         Animated.timing(fadeAnim, {
@@ -22,17 +23,20 @@ const NavigationInfo = ({distance, duration, placeName, shortName}: any) => {
     }, [placeName]);
 
     return (
-        <Animated.View style={[ styles.container, {opacity: fadeAnim} ]}>    
-            <View style={{left: 15, flexDirection: "row"}}>
+        <Animated.View style={[ styles.container, {opacity: fadeAnim} ]}> 
+            <View style={{left: 15, flexDirection: "row", position: ""}}>
                 <View style={{top: 16, right: 9}}>
                     <FontAwesomeIcon icon={faLocationDot} />
                 </View>
-                <View style={{}}>
+                <View style={{width: "90%"}}>
                     <Text style={{fontWeight: "bold"}}>{shortName}</Text>
                     <Text>{placeName}</Text>
                     <View style={{flexDirection: "row", width: 300, gap: 20, left: 35, marginLeft: "auto", marginRight: "auto"}}>
+                        
                         <Text style={{fontSize: 25}}>{Math.round(duration)} min</Text>
                         <Text style={{fontSize: 25}}>{distance} mi</Text>
+                        
+                        <Text style={{fontSize: 25}}>{remainingMeters} mi</Text>
                     </View>
                 </View>
             </View>
@@ -51,7 +55,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
     padding: 5,
     elevation: 4,
-    flex: 4
+    flex: 4,
   },
   input: {
     flex: 1,
