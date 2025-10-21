@@ -4,7 +4,7 @@ import * as Location from 'expo-location';
 import { useEffect, useState } from "react";
   
 function useLocations() {
-    const [currentLocation, setCurrentLocation] = useState();
+    const [currentLocation, setCurrentLocation] = useState<any>();
     useEffect(() => {
         let subscription: any;
         (async () => {

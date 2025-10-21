@@ -5,10 +5,11 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 
 
-const NavigationInfo = ({distance, duration, placeName, shortName, currentDistance}: any) => {    
+const NavigationInfo = ({placeName, shortName, currentDistanceDuration}: any) => {    
     //Nav Info simply displays navigation Info to the user
-    let remainingMeters = currentDistance.remainingMeters.toFixed(2);
-    console.log("remains Info", currentDistance.snappedPoint);
+    let remainingMiles = currentDistanceDuration.remainingMiles.toFixed(2);
+    let remainingMinutes = currentDistanceDuration.remainingDuration;
+    
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const fadeIn = () => {
     // Will change fadeAnim value to 1 in 5 seconds
@@ -32,11 +33,8 @@ const NavigationInfo = ({distance, duration, placeName, shortName, currentDistan
                     <Text style={{fontWeight: "bold"}}>{shortName}</Text>
                     <Text>{placeName}</Text>
                     <View style={{flexDirection: "row", width: 300, gap: 20, left: 35, marginLeft: "auto", marginRight: "auto"}}>
-                        
-                        <Text style={{fontSize: 25}}>{Math.round(duration)} min</Text>
-                        <Text style={{fontSize: 25}}>{distance} mi</Text>
-                        
-                        <Text style={{fontSize: 25}}>{remainingMeters} mi</Text>
+                        <Text style={{fontSize: 25}}>{Math.round(remainingMinutes)} min</Text>
+                        <Text style={{fontSize: 25}}>{remainingMiles} mi</Text>
                     </View>
                 </View>
             </View>

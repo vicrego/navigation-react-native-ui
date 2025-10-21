@@ -48,7 +48,7 @@ export const destinationDirection = async ({currentLocation, destLng, destLat, p
         const distanceInMiles = (response.data.routes[0].distance / 1609.34).toFixed(2);
         const durationInMinutes = (response.data.routes[0].duration / 60).toFixed(1);
         //console.log("distance Mapbox:", response.data.routes[0].legs)
-        console.log("distanceInMiles:", distanceInMiles)
+        console.log("Response Mapbox:", response.data)
         if (!routeGeometry) {
             console.warn("Nenhuma rota encontrada para o destino.");
             return null;

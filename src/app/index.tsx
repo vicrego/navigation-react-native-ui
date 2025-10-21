@@ -20,18 +20,17 @@ const Index = () => {
   const [duration, setDuration] = useState();
   const [placeName, setPlaceName] = useState();
   const [shortName, setShortName] = useState();
-  const [currentDistance, setCurrentDistance] = useState<any>();
+  const [currentDistanceDuration, setCurrentDistanceDuration] = useState<any>();
   const [searchComponent, setSearchComponent] = useState(false);
-  const [destinationCoords, setDestinationCoords] = useState([null]);
+  const [destinationCoords, setDestinationCoords] = useState<any>([null]);
   
   //Gets permission and sets coordinates based on user's location
   const currentLocation = useLocations();
   
   useEffect(() => {
     distance && (
-      setCurrentDistance(calculationDistanceAndDuration(currentLocation, route))
+      setCurrentDistanceDuration(calculationDistanceAndDuration(currentLocation, distance, duration, route))
     )
-    console.log("currenDistance Index", currentDistance.remainingLine.geometry);
   }, [distance, currentLocation, route]);
 
   const handlePress = () => {
@@ -51,8 +50,8 @@ const Index = () => {
           setDestinationCoords={setDestinationCoords}
           setPlaceName={setPlaceName}
           setShortName={setShortName}
-          currentDistance={setCurrentDistance}
-          setCurrentDistance={setCurrentDistance}
+          //currentDistance={setCurrentDistance}
+          //setCurrentDistanceDuration={setCurrentDistanceDuration}
           onSelect={(coords: any) => {
             console.log("Selected coords:", coords);
             //console.log("currentLocation", currentLocation)
@@ -67,8 +66,8 @@ const Index = () => {
         )
       }
       
-      { (distance && currentDistance) &&
-        <NavigationInfo distance={distance} duration={duration} placeName={placeName} shortName={shortName} currentDistance={currentDistance}/>
+      { (distance && currentDistanceDuration) &&
+        <NavigationInfo placeName={placeName} shortName={shortName} currentDistanceDuration={currentDistanceDuration}/>
       }
       
       <Mapbox.MapView
@@ -94,34 +93,37 @@ const Index = () => {
           />
 
           {(destinationCoords.destLat && destinationCoords.destLng) && 
-              <Mapbox.PointAnnotation
-                id="userLocation"
-                coordinate={[
-                  destinationCoords.destLng, 
-                  destinationCoords.destLat
-                ]}
-              >
-                <View style={{
-                  height: 30, 
-                  width: 30, 
-                  backgroundColor: '#00cccc', 
-                  borderRadius: 50, 
-                  borderColor: '#fff', 
-                  borderWidth: 3
-            }} />
-              </Mapbox.PointAnnotation>
+            <Mapbox.PointAnnotation
+              id="userLocation"
+              coordinate={[
+                destinationCoords.destLng, 
+                destinationCoords.destLat
+              ]}
+            >
+              <View style={{
+                height: 30, 
+                width: 30, 
+                backgroundColor: '#00cccc', 
+                borderRadius: 50, 
+                borderColor: '#fff', 
+                borderWidth: 3
+                }} 
+              />
+            </Mapbox.PointAnnotation>
           }
-          <Mapbox.ShapeSource id="routeSource" shape={currentDistance.remainingLine.geometry}>
-            <Mapbox.LineLayer
-              id="routeLine"
-              style={{
-                lineColor: "#007AFF",
-                lineWidth: 7,
-                lineJoin: "round",
-                lineCap: "round",
-              }}
-            />
-          </Mapbox.ShapeSource>
+          {currentDistanceDuration && 
+            <Mapbox.ShapeSource id="routeSource" shape={currentDistanceDuration.remainingLine.geometry}>
+              <Mapbox.LineLayer
+                id="routeLine"
+                style={{
+                  lineColor: "#007AFF",
+                  lineWidth: 7,
+                  lineJoin: "round",
+                  lineCap: "round",
+                }}
+              />
+            </Mapbox.ShapeSource>
+          }
         </>
       ) : (
         <View>
