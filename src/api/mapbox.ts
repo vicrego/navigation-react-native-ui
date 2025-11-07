@@ -3,7 +3,7 @@ import axios from "axios";
 
 //FOR MORE DATA TO FETCH ON THE API (LIKE DISTANCE, DURATION, ETC...)
 // CHECK WITHIN "RESPONSE"
-export const destinationLatLng = async ({query, publicToken}: any) => {
+/*export const destinationLatLng = async ({query, publicToken}: any) => {
     try {
         const response = await axios.get(
             `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json`,
@@ -31,7 +31,7 @@ export const destinationLatLng = async ({query, publicToken}: any) => {
         return null;
   } 
 };
-
+*/
 
 export const destinationDirection = async ({currentLocation, destLng, destLat, publicToken}: any) => {
     try {
@@ -47,16 +47,20 @@ export const destinationDirection = async ({currentLocation, destLng, destLat, p
         const routeGeometry = response.data.routes[0].geometry;
         const distanceInMiles = (response.data.routes[0].distance / 1609.34).toFixed(2);
         const durationInMinutes = (response.data.routes[0].duration / 60).toFixed(1);
-        //console.log("distance Mapbox:", response.data.routes[0].legs)
-        console.log("Response Mapbox:", response.data)
         if (!routeGeometry) {
             console.warn("Nenhuma rota encontrada para o destino.");
             return null;
         }
         return {routeGeometry, distanceInMiles, durationInMinutes}; // Retorna o objeto de rota
         
-    } catch (error) {
+    } catch (error:any) {
         console.error("Error fetching destination route:", error);
+        if (error.response) {
+            console.log("Status:", error.response.status);
+            console.log("Data:", error.response.data);
+        } else {
+            console.log("Message:", error.message);
+        }
         return null;
     }
 };

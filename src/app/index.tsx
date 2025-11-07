@@ -31,6 +31,7 @@ const Index = () => {
     distance && (
       setCurrentDistanceDuration(calculationDistanceAndDuration(currentLocation, distance, duration, route))
     )
+    
   }, [distance, currentLocation, route]);
 
   const handlePress = () => {
@@ -53,7 +54,6 @@ const Index = () => {
           //currentDistance={setCurrentDistance}
           //setCurrentDistanceDuration={setCurrentDistanceDuration}
           onSelect={(coords: any) => {
-            console.log("Selected coords:", coords);
             //console.log("currentLocation", currentLocation)
             // Move Mapbox camera or request directions
           }}    
@@ -85,19 +85,17 @@ const Index = () => {
             animationMode={'flyTo'}
             pitch={60}
             animationDuration={6000}
-          />
-      
+          /> 
           <Mapbox.PointAnnotation
             id="userLocation"
             coordinate={[currentLocation.longitude, currentLocation.latitude]}
           />
-
-          {(destinationCoords.destLat && destinationCoords.destLng) && 
+          {(destinationCoords.latitude && destinationCoords.longitude) && 
             <Mapbox.PointAnnotation
               id="userLocation"
               coordinate={[
-                destinationCoords.destLng, 
-                destinationCoords.destLat
+                destinationCoords.latitude, 
+                destinationCoords.longitude
               ]}
             >
               <View style={{
