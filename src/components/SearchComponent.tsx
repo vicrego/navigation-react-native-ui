@@ -4,7 +4,10 @@ import React, { useEffect, useState } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 import { destinationDirection } from '../api/mapbox';
 
-
+interface API{
+  item: any;
+    context:any
+}
   
 const SearchComponent = ({publicToken, onSelect, destinationCoords, currentLocation, setRoute, setDistance, setDuration, setDestinationCoords, setPlaceName, setShortName}: any) => {
 
@@ -46,7 +49,11 @@ const SearchComponent = ({publicToken, onSelect, destinationCoords, currentLocat
       </View>
       {(searchList[0] !== undefined) && (query != "") && (
         <View style={styles.innerContainer}>
-          {searchList.map((x: any, i: number)=> 
+          {searchList
+          .filter((item: any) =>
+            item?.context[3]?.text == "Greater London"
+          )
+          .map((x: any, i: number)=> 
             <View key={i}>
               <Pressable onPress={() => {
                 console.log("x Coords", x.center[0])

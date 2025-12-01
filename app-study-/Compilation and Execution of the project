@@ -1,0 +1,71 @@
+
+The Expo SDK is an intermediate layer that provides simplified access to native APIs (without needing to write Java/Kotlin).
+When you use Expo Go (the development app):
+Your JavaScript code is downloaded and dynamically interpreted inside the app, without native compilation.
+
+When you build (using expo build or eas build):
+Your JS code is bundled and optimized,
+And the app is compiled normally by Android Gradle (using the Android compilers).
+
+Full Compilation and Execution Flow — Expo + Android Studio
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                      👨‍💻 1. You write React Native code                     │
+│                                                                              │
+│  Example:                                                                    │
+│    function App() { return <Text>Hello Expo!</Text>; }                       │
+│                                                                              │
+│  JS/TS files → stored in the Expo project                                    │
+└──────────────────────────────────────────────────────────────────────────────┘
+                │
+                ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ 🧱 2. Metro Bundler (Expo’s JS server)                                       │
+│                                                                              │
+│ - Expo runs the Metro Bundler locally                                        │
+│ - This bundler “packages” all your JS/TS into a single file: bundle.js       │
+│ - It also converts TypeScript → JavaScript (via Babel)                       │
+│ - Generates optimized bytecode for the JS engine                             │
+└──────────────────────────────────────────────────────────────────────────────┘
+                │
+                ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ 📦 3. Expo SDK and Native Package                                            │
+│                                                                              │
+│ - The JS code is injected inside a native “container”                        │
+│ - This container includes:                                                   │
+│    • The JavaScript engine (Hermes or JavaScriptCore)                        │
+│    • The Expo runtime (with native APIs like camera, GPS, sensors, etc.)     │
+│                                                                              │
+│ - This native app is then packaged as an Android project (Gradle)            │
+└──────────────────────────────────────────────────────────────────────────────┘
+                │
+                ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ 🧰 4. Android Studio (Gradle Build System)                                   │
+│                                                                              │
+│ - Gradle calls the compilers:                                                │
+│    • Kotlin Compiler / Javac → JVM bytecode                                  │
+│    • D8 → converts JVM bytecode → DEX (Dalvik Executable)                    │
+│ - The DEX files + native resources + JS bundle are packed into an .APK       │
+│ - Android Studio builds the final APK and installs it on the Android emulator│
+└──────────────────────────────────────────────────────────────────────────────┘
+                │
+                ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ 📱 5. Android Emulator (ART - Android Runtime)                               │
+│                                                                              │
+│ - The Android Runtime executes the DEX code (compiled Java/Kotlin)           │
+│ - Inside the app, the JS engine (Hermes/JavaScriptCore)                      │
+│   loads and interprets the bundle.js                                         │
+│ - The JS code interacts with the native layer via the React Native “Bridge”  │
+│                                                                              │
+│   Example: console.log("Hello") → processed by Hermes → Native call          │
+│                                                                              │
+│ - The app is rendered on the Android Studio simulator                        │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+
+Would you like me to polish this into a diagram-style infographic in English 
+(like the pipeline with colored blocks and arrows)? It would make it easier to visualize 
+how Expo → Metro → Gradle → ART all connect.
