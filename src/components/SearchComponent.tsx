@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 import { destinationDirection } from '../api/mapbox';
 
+
 interface API{
   item: any;
     context:any
@@ -23,19 +24,28 @@ const SearchComponent = ({publicToken, onSelect, destinationCoords, currentLocat
     setRoute(routeGeometry);
   };
   
-
   useEffect(() => {
     if(query){
       const OnChangeText = async () =>  {
         const res = await axios.get(
           `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json`,
-          { params: { access_token: publicToken, autocomplete: true, limit: 5 } }
+          { params: 
+            { 
+              access_token: publicToken, 
+              autocomplete: true, 
+              limit: 5,
+              bbox: "-0.5103751,51.2867602,0.3340155,51.6918741",
+              steps: true,
+              proximity: `${currentLocation.longitude},${currentLocation.latitude}`
+            } 
+          }
         );    
         setSearchList(res.data.features);
       }
       OnChangeText();
     }
   }, [query]);
+
 
   return (
     <View>
@@ -50,9 +60,20 @@ const SearchComponent = ({publicToken, onSelect, destinationCoords, currentLocat
       {(searchList[0] !== undefined) && (query != "") && (
         <View style={styles.innerContainer}>
           {searchList
-          .filter((item: any) =>
-            item?.context[3]?.text == "Greater London"
-          )
+          /*.filter((item: any) => {
+            if(!item) return false
+            if (!item.context) return false;        // context é undefined
+            if (!item.context[3]) return false;     // context[3] é undefined
+
+            if(item !== undefined){
+              let value = item;
+              //console.log("item2 : ", item?.context[3]?.text)
+              return value;
+            } else{
+              console.log("here false")
+            }
+            }
+          )*/
           .map((x: any, i: number)=> 
             <View key={i}>
               <Pressable onPress={() => {
@@ -94,13 +115,14 @@ const styles = ({
     top: 100,
     left: 10,
     right: 10,
-    height: 100,
+    height: "fill",
     flexDirection: "column",
     backgroundColor: "white",
     borderRadius: 8,
     zIndex: 9,
-    padding: 5,
+    padding: 13,
     elevation: 4,
+    gap: 7
   },
   input: {
     flex: 1,

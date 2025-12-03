@@ -41,6 +41,8 @@ export const destinationDirection = async ({currentLocation, destLng, destLat, p
                 params: {
                     geometries: "geojson",
                     access_token: publicToken,
+                    steps: true,
+                    overview: "full"
                 },
             }
         );

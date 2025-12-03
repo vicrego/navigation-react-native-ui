@@ -23,7 +23,7 @@ const Index = () => {
   const [currentDistanceDuration, setCurrentDistanceDuration] = useState<any>();
   const [searchComponent, setSearchComponent] = useState(false);
   const [destinationCoords, setDestinationCoords] = useState<any>([null]);
-  
+
   //Gets permission and sets coordinates based on user's location
   const currentLocation = useLocations();
   
@@ -31,12 +31,14 @@ const Index = () => {
     distance && (
       setCurrentDistanceDuration(calculationDistanceAndDuration(currentLocation, distance, duration, route))
     )
-    
   }, [distance, currentLocation, route]);
 
   const handlePress = () => {
     setSearchComponent(true);
   }
+
+  //const result = turf.bezierSpline(...);
+
 
   return (
     <View style={styles.container}>
@@ -115,9 +117,10 @@ const Index = () => {
                 id="routeLine"
                 style={{
                   lineColor: "#007AFF",
-                  lineWidth: 7,
+                  lineWidth: 9,
                   lineJoin: "round",
                   lineCap: "round",
+                  
                 }}
               />
             </Mapbox.ShapeSource>
