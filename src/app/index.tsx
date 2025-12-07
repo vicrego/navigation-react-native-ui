@@ -5,6 +5,7 @@ import Mapbox from '@rnmapbox/maps';
 import 'expo-dev-client';
 import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
+import ArrivalModal from '../components/ArrivalModal';
 import NavigationInfo from '../components/NavigationInfo';
 import SearchComponent from '../components/SearchComponent';
 import useLocations from '../hooks/useLocations';
@@ -15,40 +16,51 @@ Mapbox.setAccessToken(publicToken);
 
 const Index = () => {
   //Index manages every state that will be displayed or used by shared component
-  const [route, setRoute] = useState(null);
-  const [distance, setDistance] = useState(0);
-  const [duration, setDuration] = useState();
+  const [destinationRoute, setDestinationRoute] = useState(null);
+  const [destinationDistance, setDestinationDistance] = useState(0);
+  const [destinationDuration, setDestinationDuration] = useState(0);
   const [placeName, setPlaceName] = useState();
   const [shortName, setShortName] = useState();
-  const [currentDistanceDuration, setCurrentDistanceDuration] = useState<any>();
+  const [currentDistanceDuration, setCurrentDistanceDuration] = useState<any>(0);
   const [searchComponent, setSearchComponent] = useState(false);
   const [destinationCoords, setDestinationCoords] = useState<any>([null]);
+  const [destinationReached, setDestinationReached] = useState(false);
 
   //Gets permission and sets coordinates based on user's location
   const currentLocation = useLocations();
   
-  useEffect(() => {
-    distance && (
-      setCurrentDistanceDuration(calculationDistanceAndDuration(currentLocation, distance, duration, route))
-    )
-  }, [distance, currentLocation, route]);
+  useEffect(() => {   
+    destinationDistance && (
+      setCurrentDistanceDuration(calculationDistanceAndDuration(currentLocation, destinationDistance, destinationDuration, destinationRoute))
+    )   
+    if(currentDistanceDuration !== 0){
+      if(currentDistanceDuration.remainingMiles.toFixed(3) <= 0.03){
+        
+        
+        //RESET DESTINATION STATE
+        setDestinationReached(true);
+        console.log("destinationReached: ", destinationReached);
+        setCurrentDistanceDuration(0);
+        setDestinationDuration(0);
+        setDestinationDistance(0);
+        console.log("ARRIIIIIIVED 2");
+      }
+    }
+  }, [destinationDistance, currentLocation, destinationRoute]);
 
   const handlePress = () => {
     setSearchComponent(true);
   }
 
-  //const result = turf.bezierSpline(...);
-
-
   return (
     <View style={styles.container}>
-      {!distance || searchComponent ? (
+      {!destinationDistance || searchComponent ? (
         <SearchComponent
           publicToken={publicToken}
           currentLocation={currentLocation}
-          setRoute={setRoute}
-          setDistance={setDistance}
-          setDuration={setDuration}
+          setDestinationRoute={setDestinationRoute}
+          setDestinationDistance={setDestinationDistance}
+          setDestinationDuration={setDestinationDuration}
           destinationCoords={destinationCoords}
           setDestinationCoords={setDestinationCoords}
           setPlaceName={setPlaceName}
@@ -68,10 +80,12 @@ const Index = () => {
         )
       }
       
-      { (distance && currentDistanceDuration) &&
+      { (destinationDistance && currentDistanceDuration && !destinationReached) &&
         <NavigationInfo placeName={placeName} shortName={shortName} currentDistanceDuration={currentDistanceDuration}/>
       }
-      
+      {
+        <ArrivalModal destinationReached={destinationReached} setDestinationReached={setDestinationReached}/>
+      }
       <Mapbox.MapView
         style={styles.map}
         styleURL={Mapbox.StyleURL.Dark}

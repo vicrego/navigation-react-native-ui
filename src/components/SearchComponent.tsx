@@ -10,7 +10,18 @@ interface API{
     context:any
 }
   
-const SearchComponent = ({publicToken, onSelect, destinationCoords, currentLocation, setRoute, setDistance, setDuration, setDestinationCoords, setPlaceName, setShortName}: any) => {
+const SearchComponent = ({
+    publicToken, 
+    onSelect, 
+    destinationCoords, 
+    currentLocation, 
+    setDestinationRoute, 
+    setDestinationDistance, 
+    setDestinationDuration, 
+    setDestinationCoords, 
+    setPlaceName, 
+    setShortName
+  }: any) => {
 
   const [query, setQuery] = useState("");
   const [searchList, setSearchList] = useState([])
@@ -19,9 +30,9 @@ const SearchComponent = ({publicToken, onSelect, destinationCoords, currentLocat
   const handleSearch = async (destLng: any, destLat: any) => {
     if (!query) return;
     const {routeGeometry, distanceInMiles, durationInMinutes}: any = await destinationDirection({currentLocation, destLng, destLat, publicToken});
-    setDistance(distanceInMiles);
-    setDuration(durationInMinutes);
-    setRoute(routeGeometry);
+    setDestinationDistance(distanceInMiles);
+    setDestinationDuration(durationInMinutes);
+    setDestinationRoute(routeGeometry);
   };
   
   useEffect(() => {
@@ -60,20 +71,6 @@ const SearchComponent = ({publicToken, onSelect, destinationCoords, currentLocat
       {(searchList[0] !== undefined) && (query != "") && (
         <View style={styles.innerContainer}>
           {searchList
-          /*.filter((item: any) => {
-            if(!item) return false
-            if (!item.context) return false;        // context é undefined
-            if (!item.context[3]) return false;     // context[3] é undefined
-
-            if(item !== undefined){
-              let value = item;
-              //console.log("item2 : ", item?.context[3]?.text)
-              return value;
-            } else{
-              console.log("here false")
-            }
-            }
-          )*/
           .map((x: any, i: number)=> 
             <View key={i}>
               <Pressable onPress={() => {

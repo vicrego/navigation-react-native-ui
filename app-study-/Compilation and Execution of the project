@@ -64,8 +64,3 @@ Full Compilation and Execution Flow — Expo + Android Studio
 │                                                                              │
 │ - The app is rendered on the Android Studio simulator                        │
 └──────────────────────────────────────────────────────────────────────────────┘
-
-
-Would you like me to polish this into a diagram-style infographic in English 
-(like the pipeline with colored blocks and arrows)? It would make it easier to visualize 
-how Expo → Metro → Gradle → ART all connect.
