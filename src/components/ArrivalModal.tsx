@@ -1,48 +1,49 @@
-import React, { useEffect } from 'react';
-import { Alert, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import React from "react";
+import { Alert, Modal, Pressable, StyleSheet, Text, View } from "react-native";
 
-const ArrivalModal = ({destinationReached, setDestinationReached}: any) => {
-    useEffect(() => {
-        console.log("destinationReached: ", destinationReached)
-    }, [])
-    
-    return (
-        <Modal
-            animationType="slide"
-            transparent={true}
-            visible={destinationReached}
-            onRequestClose={() => {
-                Alert.alert('Modal has been closed.');
-                setDestinationReached(!destinationReached);
-            }}
-        >
-            <View style={styles.centeredView}>
-                <View style={styles.modalView}>
-                <Text style={styles.modalText}>Hello World!</Text>
-                <Pressable
-                    style={[styles.button, styles.buttonClose]}
-                    onPress={() => setDestinationReached(!destinationReached)}>
-                    <Text style={styles.textStyle}>You've Arrived</Text>
-                </Pressable>
-                </View>
-            </View>
-        </Modal>
-    )
-}
+const ArrivalModal = ({
+  destinationReached,
+  setDestinationReached,
+  setDestinationCoords,
+}: any) => {
+  return (
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={destinationReached}
+      onRequestClose={() => {
+        Alert.alert("Modal has been closed.");
+        setDestinationReached(!destinationReached);
+      }}
+    >
+      <View style={styles.centeredView}>
+        <View style={styles.modalView}>
+          <Text style={styles.modalText}>Hello World!</Text>
+          <Pressable
+            style={[styles.button, styles.buttonClose]}
+            onPress={() => setDestinationReached(!destinationReached)}
+          >
+            <Text style={styles.textStyle}>You've Arrived</Text>
+          </Pressable>
+        </View>
+      </View>
+    </Modal>
+  );
+};
 
 const styles = StyleSheet.create({
   centeredView: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalView: {
     margin: 20,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 20,
     padding: 35,
-    alignItems: 'center',
-    shadowColor: '#000',
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -57,22 +58,20 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   buttonOpen: {
-    backgroundColor: '#F194FF',
+    backgroundColor: "#F194FF",
   },
   buttonClose: {
-    backgroundColor: '#2196F3',
+    backgroundColor: "#2196F3",
   },
   textStyle: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
   },
   modalText: {
     marginBottom: 15,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });
 
-
-
-export default ArrivalModal
+export default ArrivalModal;

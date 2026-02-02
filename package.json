@@ -8,6 +8,7 @@
     "android": "expo run:android",
     "android-build": "eas build --profile development-simulator --platform android",
     "ios-build": "eas build --profile development-simulator --platform iOS",
+    "eas-build-android": "eas build --profile preview --platform android --local",
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint",
