@@ -132,7 +132,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#2180e59c",
     borderRadius: 8,
     padding: 10,
-    //backgroundColor: "blue"
   },
 });
 

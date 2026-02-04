@@ -1,11 +1,7 @@
 import React from "react";
 import { Alert, Modal, Pressable, StyleSheet, Text, View } from "react-native";
 
-const ArrivalModal = ({
-  destinationReached,
-  setDestinationReached,
-  setDestinationCoords,
-}: any) => {
+const ArrivalModal = ({ destinationReached, setDestinationReached }: any) => {
   return (
     <Modal
       animationType="slide"

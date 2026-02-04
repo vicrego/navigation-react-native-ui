@@ -1,9 +1,10 @@
 import { faEllipsis } from "@fortawesome/free-solid-svg-icons/faEllipsis";
+import { faLocationCrosshairs } from "@fortawesome/free-solid-svg-icons/faLocationCrosshairs";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { Text } from "@react-navigation/elements";
 import Mapbox from "@rnmapbox/maps";
 import "expo-dev-client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import ArrivalModal from "../components/ArrivalModal";
 import NavigationInfo from "../components/NavigationInfo";
@@ -30,6 +31,17 @@ const Index = () => {
 
   //Gets permission and sets coordinates based on user's location
   const currentLocation = useLocations();
+
+  // 1. Create the reference
+  const cameraRef = useRef<Mapbox.Camera>(null);
+
+  const handleRecenter = () => {
+    cameraRef.current?.setCamera({
+      centerCoordinate: [currentLocation.longitude, currentLocation.latitude], // London center
+      zoomLevel: 15,
+      animationDuration: 1000, // 1 second smooth glide
+    });
+  };
 
   useEffect(() => {
     !!destinationDistance &&
@@ -90,6 +102,23 @@ const Index = () => {
           </Pressable>
         </View>
       )}
+      <View
+        style={{
+          position: "absolute",
+          top: 800,
+          right: 25,
+          alignSelf: "flex-end",
+          zIndex: 1,
+        }}
+      >
+        <Pressable onPress={() => handleRecenter()}>
+          <FontAwesomeIcon
+            icon={faLocationCrosshairs as any}
+            style={{ color: "white" }}
+            size={50}
+          />
+        </Pressable>
+      </View>
 
       {!!destinationDistance &&
         !!currentDistanceDuration /*&& !destinationReached*/ && (
@@ -116,6 +145,7 @@ const Index = () => {
         {currentLocation ? (
           <>
             <Mapbox.Camera
+              ref={cameraRef}
               zoomLevel={15}
               // Allow user to see the whole city
               minZoomLevel={10}
@@ -125,10 +155,13 @@ const Index = () => {
                 sw: [-0.489, 51.28],
                 ne: [0.236, 51.686],
               }}
-              centerCoordinate={[
-                currentLocation.longitude,
-                currentLocation.latitude,
-              ]}
+              defaultSettings={{
+                zoomLevel: 15,
+                centerCoordinate: [
+                  currentLocation.longitude,
+                  currentLocation.latitude,
+                ],
+              }}
               animationMode={"flyTo"}
               pitch={60}
               animationDuration={6000}
