@@ -2,7 +2,7 @@ import { faEllipsis } from "@fortawesome/free-solid-svg-icons/faEllipsis";
 import { faLocationCrosshairs } from "@fortawesome/free-solid-svg-icons/faLocationCrosshairs";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { Text } from "@react-navigation/elements";
-import Mapbox from "@rnmapbox/maps";
+import Mapbox, { UserTrackingMode } from "@rnmapbox/maps";
 import "expo-dev-client";
 import React, { useEffect, useRef, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
@@ -28,19 +28,40 @@ const Index = () => {
   const [searchComponent, setSearchComponent] = useState(false);
   const [destinationCoords, setDestinationCoords] = useState<any>([null]);
   const [destinationReached, setDestinationReached] = useState(false);
+  const [isFollowingRoute, setIsFollowingRoute] = useState(false);
 
   //Gets permission and sets coordinates based on user's location
   const currentLocation = useLocations();
 
-  // 1. Create the reference
   const cameraRef = useRef<Mapbox.Camera>(null);
 
+  useEffect(() => {
+    if (
+      destinationCoords?.latitude &&
+      destinationCoords?.longitude &&
+      !destinationReached
+    ) {
+      setIsFollowingRoute(true);
+    } else {
+      setIsFollowingRoute(false);
+    }
+  }, [
+    destinationCoords?.latitude,
+    destinationCoords?.longitude,
+    destinationReached,
+  ]);
+
   const handleRecenter = () => {
-    cameraRef.current?.setCamera({
-      centerCoordinate: [currentLocation.longitude, currentLocation.latitude], // London center
-      zoomLevel: 15,
-      animationDuration: 1000, // 1 second smooth glide
-    });
+    if (!isFollowingRoute) {
+      return cameraRef.current?.setCamera({
+        centerCoordinate: [currentLocation.longitude, currentLocation.latitude],
+        zoomLevel: 15,
+        animationDuration: 1000,
+      });
+    }
+    //This resets followUserLocation, so the camera follows the currentLocation during FollowingRoute
+    setIsFollowingRoute(false);
+    setTimeout(() => setIsFollowingRoute(true), 10);
   };
 
   useEffect(() => {
@@ -155,47 +176,54 @@ const Index = () => {
                 sw: [-0.489, 51.28],
                 ne: [0.236, 51.686],
               }}
+              // Follows current user location once a route is established
+              followUserLocation={isFollowingRoute}
+              followUserMode={UserTrackingMode.FollowWithCourse}
               defaultSettings={{
                 zoomLevel: 15,
                 centerCoordinate: [
-                  currentLocation.longitude,
-                  currentLocation.latitude,
+                  currentLocation?.longitude,
+                  currentLocation?.latitude,
                 ],
               }}
               animationMode={"flyTo"}
               pitch={60}
-              animationDuration={6000}
+              animationDuration={3000}
             />
-            <Mapbox.PointAnnotation
-              id={"userLocation"}
-              coordinate={[currentLocation.longitude, currentLocation.latitude]}
-            >
-              <View style={styles.annotationContainer}>
-                <View style={styles.annotationFill} />
-              </View>
-            </Mapbox.PointAnnotation>
-            {destinationCoords?.latitude &&
-              destinationCoords?.longitude &&
-              !destinationReached && (
-                <Mapbox.PointAnnotation
-                  id="destinationMarker"
-                  coordinate={[
-                    destinationCoords.longitude,
-                    destinationCoords.latitude,
-                  ]}
-                >
-                  <View
-                    style={{
-                      height: 20,
-                      width: 20,
-                      backgroundColor: "#00cccc",
-                      borderRadius: 50,
-                      borderColor: "#fff",
-                      borderWidth: 3,
-                    }}
-                  />
-                </Mapbox.PointAnnotation>
-              )}
+            <Mapbox.Images
+              images={{
+                "car-arrow": require("../../assets/images/arrow.png"),
+              }}
+            />
+            <Mapbox.LocationPuck
+              puckBearingEnabled={true}
+              puckBearing="course" // Points the arrow where the car is moving
+              //topImage={require('./assets/nav-arrow.png')} // Your custom arrow image
+              //shadowImage={require('./assets/puck-shadow.png')}
+              topImage="car-arrow"
+              scale={0.2}
+            />
+
+            {isFollowingRoute && !destinationReached && (
+              <Mapbox.PointAnnotation
+                id="destinationMarker"
+                coordinate={[
+                  destinationCoords?.longitude,
+                  destinationCoords?.latitude,
+                ]}
+              >
+                <View
+                  style={{
+                    height: 20,
+                    width: 20,
+                    backgroundColor: "#00cccc",
+                    borderRadius: 50,
+                    borderColor: "#fff",
+                    borderWidth: 3,
+                  }}
+                />
+              </Mapbox.PointAnnotation>
+            )}
             {!!currentDistanceDuration && (
               <Mapbox.ShapeSource
                 id="routeSource"

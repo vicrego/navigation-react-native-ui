@@ -1,5 +1,5 @@
 import React from "react";
-import { Alert, Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 
 const ArrivalModal = ({ destinationReached, setDestinationReached }: any) => {
   return (
@@ -8,13 +8,11 @@ const ArrivalModal = ({ destinationReached, setDestinationReached }: any) => {
       transparent={true}
       visible={destinationReached}
       onRequestClose={() => {
-        Alert.alert("Modal has been closed.");
         setDestinationReached(!destinationReached);
       }}
     >
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
-          <Text style={styles.modalText}>Hello World!</Text>
           <Pressable
             style={[styles.button, styles.buttonClose]}
             onPress={() => setDestinationReached(!destinationReached)}
