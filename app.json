@@ -60,7 +60,9 @@
         {
           "locationAlwaysAndWhenInUsePermission": "Allow $(gps-project-ui) to use your location."
         }
-      ]
+      ],
+      "expo-sqlite",
+      "@react-native-google-signin/google-signin"
     ],
     "experiments": {
       "typedRoutes": true,

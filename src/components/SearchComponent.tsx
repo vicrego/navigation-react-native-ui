@@ -76,8 +76,10 @@ const SearchComponent = ({
             <View key={i}>
               <Pressable
                 onPress={() => {
-                  setPlaceName(x.place_name);
-                  setShortName(x.text);
+                  setPlaceName({
+                    place_name: x.place_name,
+                    short_name: x.text,
+                  });
                   setDestinationCoords({
                     longitude: x.center[0],
                     latitude: x.center[1],
@@ -104,7 +106,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: "white",
     borderRadius: 8,
-    zIndex: 1,
+    zIndex: 2,
     padding: 5,
     elevation: 4,
   },
@@ -123,7 +125,9 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
+    width: 20,
     paddingHorizontal: 8,
+    zIndex: 3,
   },
   button: {
     flexDirection: "row",

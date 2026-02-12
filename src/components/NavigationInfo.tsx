@@ -4,11 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import React, { useEffect, useRef } from "react";
 import { Animated, StyleSheet, Text, View } from "react-native";
 
-const NavigationInfo = ({
-  placeName,
-  shortName,
-  currentDistanceDuration,
-}: any) => {
+const NavigationInfo = ({ placeName, currentDistanceDuration }: any) => {
   //Nav Info simply displays navigation Info to the user
   let remainingMiles = currentDistanceDuration.remainingMiles.toFixed(2);
   let remainingMinutes = currentDistanceDuration.remainingDuration;
@@ -33,8 +29,8 @@ const NavigationInfo = ({
           <FontAwesomeIcon icon={faLocationDot as any} />
         </View>
         <View style={{ width: "90%" }}>
-          <Text style={{ fontWeight: "bold" }}>{shortName}</Text>
-          <Text>{placeName}</Text>
+          <Text style={{ fontWeight: "bold" }}>{placeName.short_name}</Text>
+          <Text>{placeName.place_name}</Text>
           <View
             style={{
               flexDirection: "row",

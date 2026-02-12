@@ -1,40 +1,72 @@
+import { faCircleUser } from "@fortawesome/free-solid-svg-icons/faCircleUser";
 import { faEllipsis } from "@fortawesome/free-solid-svg-icons/faEllipsis";
 import { faLocationCrosshairs } from "@fortawesome/free-solid-svg-icons/faLocationCrosshairs";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { Text } from "@react-navigation/elements";
-import Mapbox, { UserTrackingMode } from "@rnmapbox/maps";
+import { Button } from "@react-navigation/elements";
+import Mapbox from "@rnmapbox/maps";
 import "expo-dev-client";
+import { router } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
+import { supabase } from "../api/supabase";
 import ArrivalModal from "../components/ArrivalModal";
+import MapboxComponents from "../components/MapboxComponents";
 import NavigationInfo from "../components/NavigationInfo";
 import SearchComponent from "../components/SearchComponent";
+import SignInModal from "../components/SignInModal";
 import useLocations from "../hooks/useLocations";
+import { useRoutes } from "../hooks/useRoutes";
+import { NavigationState } from "../types/navigation";
 import { calculationDistanceAndDuration } from "../utils/navigationUtils";
 
-let publicToken =
-  "pk.eyJ1IjoidmljcmVnbyIsImEiOiJjbWc2OWQ2cjkwYmR3MmxzZHZ4aWpzcDM2In0.7_PNb8rw61ISZt1Q7ysIuw";
-Mapbox.setAccessToken(publicToken);
-
+let publicToken = process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN;
+if (publicToken) {
+  Mapbox.setAccessToken(publicToken);
+}
 const Index = () => {
   //Index manages every state that will be displayed or used by shared component
   const [destinationRoute, setDestinationRoute] = useState(null);
-  const [destinationDistance, setDestinationDistance] = useState(0);
-  const [destinationDuration, setDestinationDuration] = useState(0);
-  const [placeName, setPlaceName] = useState();
-  const [shortName, setShortName] = useState();
+  const [destinationDistance, setDestinationDistance] = useState(0); // Static Number
+  const [destinationDuration, setDestinationDuration] = useState(0); // Static Number
   const [currentDistanceDuration, setCurrentDistanceDuration] =
-    useState<any>(0);
-  const [searchComponent, setSearchComponent] = useState(false);
+    useState<NavigationState | null>(null); // Dynamic Numbers (Based On Route)
+  const [placeName, setPlaceName] = useState();
+  const [searchComponentOn, setSearchComponentOn] = useState(false);
   const [destinationCoords, setDestinationCoords] = useState<any>([null]);
   const [destinationReached, setDestinationReached] = useState(false);
   const [isFollowingRoute, setIsFollowingRoute] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   //Gets permission and sets coordinates based on user's location
   const currentLocation = useLocations();
 
   const cameraRef = useRef<Mapbox.Camera>(null);
+  const [storedData, setStoredData] = useState<any>([]);
+  const { saveCurrentRoute, loading } = useRoutes();
 
+  useEffect(() => {
+    // Listen for changes (Login, Logout, Token Refresh)
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        console.log("User is logged in:", session.user.email);
+        getStoredData();
+      } else {
+        console.log("User is logged out");
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  async function getStoredData() {
+    const { data } = await supabase.from("Test").select();
+    console.log("data", data);
+    setStoredData(data);
+  }
+
+  // FollowingRoute Logic
   useEffect(() => {
     if (
       destinationCoords?.latitude &&
@@ -51,6 +83,49 @@ const Index = () => {
     destinationReached,
   ]);
 
+  //Save Completed Route Into Supabase's Database
+  useEffect(() => {
+    const isArriving =
+      currentDistanceDuration !== null &&
+      currentDistanceDuration.remainingMiles <= 0.028;
+    if (isFollowingRoute && isArriving) {
+      console.log("Hereee");
+      saveCurrentRoute(
+        currentDistanceDuration.remainingLine.geometry,
+        destinationDistance,
+        destinationDuration,
+        destinationCoords,
+      );
+    }
+  }, [
+    isFollowingRoute,
+    currentDistanceDuration !== null &&
+      currentDistanceDuration?.remainingMiles <= 0.028,
+  ]);
+
+  //Resets destination State
+  useEffect(() => {
+    !!destinationDistance &&
+      setCurrentDistanceDuration(
+        calculationDistanceAndDuration(
+          currentLocation,
+          destinationDistance,
+          destinationDuration,
+          destinationRoute,
+        ),
+      );
+    if (currentDistanceDuration?.remainingMiles !== undefined) {
+      if (currentDistanceDuration.remainingMiles <= 0.03) {
+        setDestinationReached(true);
+        setCurrentDistanceDuration(null);
+        setDestinationDuration(0);
+        setDestinationDistance(0);
+        setDestinationCoords(undefined);
+      }
+    }
+  }, [destinationDistance, currentLocation, destinationRoute]);
+
+  //BUTTONS
   const handleRecenter = () => {
     if (!isFollowingRoute) {
       return cameraRef.current?.setCamera({
@@ -64,35 +139,17 @@ const Index = () => {
     setTimeout(() => setIsFollowingRoute(true), 10);
   };
 
-  useEffect(() => {
-    !!destinationDistance &&
-      setCurrentDistanceDuration(
-        calculationDistanceAndDuration(
-          currentLocation,
-          destinationDistance,
-          destinationDuration,
-          destinationRoute,
-        ),
-      );
-    if (currentDistanceDuration !== 0) {
-      if (currentDistanceDuration.remainingMiles.toFixed(3) <= 0.03) {
-        //RESET DESTINATION STATE
-        setDestinationReached(true);
-        setCurrentDistanceDuration(0);
-        setDestinationDuration(0);
-        setDestinationDistance(0);
-        setDestinationCoords(undefined);
-      }
-    }
-  }, [destinationDistance, currentLocation, destinationRoute]);
-
   const handlePress = () => {
-    setSearchComponent(true);
+    setSearchComponentOn(true);
   };
+
+  supabase.auth.signInWithOAuth({
+    provider: "google",
+  });
 
   return (
     <View style={styles.container}>
-      {!destinationDistance || searchComponent ? (
+      {!destinationDistance || searchComponentOn ? (
         <SearchComponent
           publicToken={publicToken}
           currentLocation={currentLocation}
@@ -102,7 +159,6 @@ const Index = () => {
           destinationCoords={destinationCoords}
           setDestinationCoords={setDestinationCoords}
           setPlaceName={setPlaceName}
-          setShortName={setShortName}
         />
       ) : (
         <View
@@ -140,113 +196,57 @@ const Index = () => {
           />
         </Pressable>
       </View>
-
+      {modalVisible && (
+        <SignInModal
+          modalVisible={modalVisible}
+          setModalVisible={setModalVisible}
+        />
+      )}
+      <Pressable
+        style={{
+          position: "absolute",
+          top: 200,
+          padding: 20,
+          borderRadius: 20,
+          zIndex: 1,
+          backgroundColor: "blue",
+        }}
+        onPress={() => setModalVisible(true)}
+      >
+        <FontAwesomeIcon
+          icon={faCircleUser as any}
+          style={{ color: "white" }}
+          size={50}
+        />
+      </Pressable>
       {!!destinationDistance &&
         !!currentDistanceDuration /*&& !destinationReached*/ && (
           <NavigationInfo
             placeName={placeName}
-            shortName={shortName}
             currentDistanceDuration={currentDistanceDuration}
           />
         )}
-      {
-        <ArrivalModal
-          destinationReached={destinationReached}
-          setDestinationReached={setDestinationReached}
-          setDestinationCoords={setDestinationCoords}
-        />
-      }
-      <Mapbox.MapView
-        style={styles.map}
-        styleURL={Mapbox.StyleURL.Dark}
-        rotateEnabled={true}
-        pitchEnabled={true}
-        onPress={() => setSearchComponent(false)}
+      <ArrivalModal
+        destinationReached={destinationReached}
+        setDestinationReached={setDestinationReached}
+        setDestinationCoords={setDestinationCoords}
+      />
+      <Button
+        //title="Go to Dashboard"
+        style={{ position: "absolute", top: 300, zIndex: 2 }}
+        onPress={() => router.push("/dashboard")}
       >
-        {currentLocation ? (
-          <>
-            <Mapbox.Camera
-              ref={cameraRef}
-              zoomLevel={15}
-              // Allow user to see the whole city
-              minZoomLevel={10}
-              // Allow user to see street details
-              maxZoomLevel={19}
-              maxBounds={{
-                sw: [-0.489, 51.28],
-                ne: [0.236, 51.686],
-              }}
-              // Follows current user location once a route is established
-              followUserLocation={isFollowingRoute}
-              followUserMode={UserTrackingMode.FollowWithCourse}
-              defaultSettings={{
-                zoomLevel: 15,
-                centerCoordinate: [
-                  currentLocation?.longitude,
-                  currentLocation?.latitude,
-                ],
-              }}
-              animationMode={"flyTo"}
-              pitch={60}
-              animationDuration={3000}
-            />
-            <Mapbox.Images
-              images={{
-                "car-arrow": require("../../assets/images/arrow.png"),
-              }}
-            />
-            <Mapbox.LocationPuck
-              puckBearingEnabled={true}
-              puckBearing="course" // Points the arrow where the car is moving
-              //topImage={require('./assets/nav-arrow.png')} // Your custom arrow image
-              //shadowImage={require('./assets/puck-shadow.png')}
-              topImage="car-arrow"
-              scale={0.2}
-            />
-
-            {isFollowingRoute && !destinationReached && (
-              <Mapbox.PointAnnotation
-                id="destinationMarker"
-                coordinate={[
-                  destinationCoords?.longitude,
-                  destinationCoords?.latitude,
-                ]}
-              >
-                <View
-                  style={{
-                    height: 20,
-                    width: 20,
-                    backgroundColor: "#00cccc",
-                    borderRadius: 50,
-                    borderColor: "#fff",
-                    borderWidth: 3,
-                  }}
-                />
-              </Mapbox.PointAnnotation>
-            )}
-            {!!currentDistanceDuration && (
-              <Mapbox.ShapeSource
-                id="routeSource"
-                shape={currentDistanceDuration.remainingLine.geometry}
-              >
-                <Mapbox.LineLayer
-                  id="routeLine"
-                  style={{
-                    lineColor: "#007AFF",
-                    lineWidth: 9,
-                    lineJoin: "round",
-                    lineCap: "round",
-                  }}
-                />
-              </Mapbox.ShapeSource>
-            )}
-          </>
-        ) : (
-          <View>
-            <Text>Waiting for location...</Text>
-          </View>
-        )}
-      </Mapbox.MapView>
+        Go to Details
+      </Button>
+      <MapboxComponents
+        currentLocation={currentLocation}
+        setSearchComponent={setSearchComponentOn}
+        cameraRef={cameraRef}
+        isFollowingRoute={isFollowingRoute}
+        destinationCoords={destinationCoords}
+        currentDistanceDuration={currentDistanceDuration}
+        destinationReached
+      />
     </View>
   );
 };
@@ -254,6 +254,11 @@ const Index = () => {
 export default Index;
 
 const styles = StyleSheet.create({
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   container: {
     flex: 1,
     backgroundColor: "#fff",
