@@ -19,7 +19,6 @@ export default function DashBoardScreen() {
   useEffect(() => {
     const getStoredData = async () => {
       const { data, error } = await supabase.from("saved_routes").select();
-      console.log("data: ", data);
       if (data) setRoutes(data);
     };
     getStoredData();
@@ -137,7 +136,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     padding: 15,
     gap: 15,
-    backgroundColor: "#f8f9fa",
   },
   menuButton: {
     backgroundColor: "#fff",
@@ -164,7 +162,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logoutButton: {
-    backgroundColor: "#ff4444",
+    //backgroundColor: "#ff4444",
     padding: 16,
     borderRadius: 12,
   },

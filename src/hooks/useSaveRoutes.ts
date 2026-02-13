@@ -2,6 +2,10 @@
 
 import { LineString } from "geojson";
 import { useEffect, useState } from "react";
+import {
+  destinationCoordinateToAddress,
+  startingCoordinateToAddress,
+} from "../api/mapbox";
 import { supabase } from "../api/supabase";
 
 export const useRoutes = (
@@ -36,8 +40,17 @@ export const useRoutes = (
     const {
       data: { user },
     } = await supabase.auth.getUser();
-
+    console.log("destinationCoords: ", destinationCoords);
     if (!user) return alert("Please login first!");
+
+    //LOGIC FOR COORDINATES TO ADDRESS
+    const startingAddress = await startingCoordinateToAddress(
+      currentDistanceDuration?.remainingLine.geometry.coordinates[0],
+    );
+    const destinationAddress =
+      await destinationCoordinateToAddress(destinationCoords);
+    console.log("startingAddress: ", startingAddress);
+    console.log("destinationAddress: ", destinationAddress);
 
     const { error } = await supabase.from("saved_routes").insert([
       {
@@ -46,6 +59,8 @@ export const useRoutes = (
         destinationDistance: destinationDistance,
         destinationDuration: destinationDuration,
         destinationCoords: destinationCoords,
+        startingAddress: startingAddress,
+        destinationAddress: destinationAddress,
       },
     ]);
     if (error) console.error("Error saving:", error.message);

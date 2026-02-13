@@ -25,6 +25,9 @@ const savedroutes = () => {
           data={parsedData}
           //estimatedItemSize={100}
           renderItem={({ item }: any) => {
+            console.log("item1: ", item.startingAddress);
+            console.log("item2: ", item.destinationAddress);
+
             const date = new Date(item?.created_at);
             const formattedDate = date.toLocaleDateString("en-US", {
               month: "short",
@@ -38,6 +41,8 @@ const savedroutes = () => {
             return (
               <View style={styles.routeCard}>
                 <Text style={styles.title}>Trip to Destination</Text>
+                <Text>From {item.startingAddress}</Text>
+                <Text>To {item.destinationAddress}</Text>
                 <Text>{formattedDate}</Text>
                 <Text>{formattedTime}</Text>
                 <Text>{item?.destinationDistance} miles traveled</Text>

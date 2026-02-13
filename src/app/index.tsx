@@ -87,7 +87,7 @@ const Index = () => {
     const { data } = await supabase.from("saved_routes").select();
     if (data) {
       console.log("data", data[0].created_at);
-      setUserId(data[0].created_at);
+      setUserId(data[0]?.created_at);
     }
     setStoredData(data);
   }
