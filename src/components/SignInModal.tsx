@@ -61,25 +61,6 @@ const SignInModal = ({ modalVisible, setModalVisible }: any) => {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      // Sign out from Supabase (removes the session from storage)
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-
-      // 2. Sign out from Google (removes the "saved" account from the library)
-      await GoogleSignin.signOut();
-
-      // 3. UI and Data Cleanup
-      setAuthData(null);
-      setModalVisible(false);
-      console.log("User signed out successfully");
-      console.log("authData here: ", authData);
-    } catch (error) {
-      console.error("Error signing out:", error);
-    }
-  };
-
   return (
     <Modal
       animationType="slide"
@@ -97,21 +78,11 @@ const SignInModal = ({ modalVisible, setModalVisible }: any) => {
               ? `Logged in as ${authData?.user.email}`
               : "LOGIN"}
           </Text>
-
-          {isLogged ? (
-            <Pressable
-              style={styles.buttonLogout}
-              onPress={() => handleLogout()}
-            >
-              <Text style={styles.textStyle}>Sign Out</Text>
-            </Pressable>
-          ) : (
-            <GoogleSigninButton
-              size={GoogleSigninButton.Size.Wide}
-              color={GoogleSigninButton.Color.Dark}
-              onPress={() => handleSignIn()}
-            />
-          )}
+          <GoogleSigninButton
+            size={GoogleSigninButton.Size.Wide}
+            color={GoogleSigninButton.Color.Dark}
+            onPress={() => handleSignIn()}
+          />
           <Pressable onPress={() => setModalVisible(false)}>
             <Text style={{ marginTop: 15, color: "gray" }}>Cancel</Text>
           </Pressable>
@@ -159,15 +130,15 @@ const styles = StyleSheet.create({
   buttonClose: {
     backgroundColor: "#2196F3",
   },
-  textStyle: {
-    color: "white",
-    fontWeight: "bold",
-    textAlign: "center",
-  },
   modalText: {
     marginBottom: 15,
     textAlign: "center",
     width: 200,
+  },
+  textStyle: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
   },
   buttonLogout: {
     backgroundColor: "blue",

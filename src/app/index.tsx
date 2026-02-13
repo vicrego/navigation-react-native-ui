@@ -2,7 +2,6 @@ import { faCircleUser } from "@fortawesome/free-solid-svg-icons/faCircleUser";
 import { faEllipsis } from "@fortawesome/free-solid-svg-icons/faEllipsis";
 import { faLocationCrosshairs } from "@fortawesome/free-solid-svg-icons/faLocationCrosshairs";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { Button } from "@react-navigation/elements";
 import Mapbox from "@rnmapbox/maps";
 import "expo-dev-client";
 import { router } from "expo-router";
@@ -14,8 +13,9 @@ import MapboxComponents from "../components/MapboxComponents";
 import NavigationInfo from "../components/NavigationInfo";
 import SearchComponent from "../components/SearchComponent";
 import SignInModal from "../components/SignInModal";
+import { useCurrentRoute } from "../hooks/useCurrentRoute";
 import useLocations from "../hooks/useLocations";
-import { useRoutes } from "../hooks/useRoutes";
+import { useRoutes } from "../hooks/useSaveRoutes";
 import { NavigationState } from "../types/navigation";
 import { calculationDistanceAndDuration } from "../utils/navigationUtils";
 
@@ -36,13 +36,37 @@ const Index = () => {
   const [destinationReached, setDestinationReached] = useState(false);
   const [isFollowingRoute, setIsFollowingRoute] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [userId, setUserId] = useState();
 
   //Gets permission and sets coordinates based on user's location
   const currentLocation = useLocations();
 
   const cameraRef = useRef<Mapbox.Camera>(null);
   const [storedData, setStoredData] = useState<any>([]);
-  const { saveCurrentRoute, loading } = useRoutes();
+  useRoutes(
+    currentDistanceDuration,
+    isFollowingRoute,
+    destinationDistance,
+    destinationDuration,
+    destinationCoords,
+  );
+
+  useCurrentRoute(
+    destinationCoords,
+    destinationReached,
+    setIsFollowingRoute,
+    destinationDistance,
+    setCurrentDistanceDuration,
+    calculationDistanceAndDuration,
+    currentLocation,
+    destinationDuration,
+    destinationRoute,
+    currentDistanceDuration,
+    setDestinationReached,
+    setDestinationDuration,
+    setDestinationDistance,
+    setDestinationCoords,
+  );
 
   useEffect(() => {
     // Listen for changes (Login, Logout, Token Refresh)
@@ -56,74 +80,17 @@ const Index = () => {
         console.log("User is logged out");
       }
     });
-
     return () => subscription.unsubscribe();
   }, []);
 
   async function getStoredData() {
-    const { data } = await supabase.from("Test").select();
-    console.log("data", data);
+    const { data } = await supabase.from("saved_routes").select();
+    if (data) {
+      console.log("data", data[0].created_at);
+      setUserId(data[0].created_at);
+    }
     setStoredData(data);
   }
-
-  // FollowingRoute Logic
-  useEffect(() => {
-    if (
-      destinationCoords?.latitude &&
-      destinationCoords?.longitude &&
-      !destinationReached
-    ) {
-      setIsFollowingRoute(true);
-    } else {
-      setIsFollowingRoute(false);
-    }
-  }, [
-    destinationCoords?.latitude,
-    destinationCoords?.longitude,
-    destinationReached,
-  ]);
-
-  //Save Completed Route Into Supabase's Database
-  useEffect(() => {
-    const isArriving =
-      currentDistanceDuration !== null &&
-      currentDistanceDuration.remainingMiles <= 0.028;
-    if (isFollowingRoute && isArriving) {
-      console.log("Hereee");
-      saveCurrentRoute(
-        currentDistanceDuration.remainingLine.geometry,
-        destinationDistance,
-        destinationDuration,
-        destinationCoords,
-      );
-    }
-  }, [
-    isFollowingRoute,
-    currentDistanceDuration !== null &&
-      currentDistanceDuration?.remainingMiles <= 0.028,
-  ]);
-
-  //Resets destination State
-  useEffect(() => {
-    !!destinationDistance &&
-      setCurrentDistanceDuration(
-        calculationDistanceAndDuration(
-          currentLocation,
-          destinationDistance,
-          destinationDuration,
-          destinationRoute,
-        ),
-      );
-    if (currentDistanceDuration?.remainingMiles !== undefined) {
-      if (currentDistanceDuration.remainingMiles <= 0.03) {
-        setDestinationReached(true);
-        setCurrentDistanceDuration(null);
-        setDestinationDuration(0);
-        setDestinationDistance(0);
-        setDestinationCoords(undefined);
-      }
-    }
-  }, [destinationDistance, currentLocation, destinationRoute]);
 
   //BUTTONS
   const handleRecenter = () => {
@@ -202,23 +169,7 @@ const Index = () => {
           setModalVisible={setModalVisible}
         />
       )}
-      <Pressable
-        style={{
-          position: "absolute",
-          top: 200,
-          padding: 20,
-          borderRadius: 20,
-          zIndex: 1,
-          backgroundColor: "blue",
-        }}
-        onPress={() => setModalVisible(true)}
-      >
-        <FontAwesomeIcon
-          icon={faCircleUser as any}
-          style={{ color: "white" }}
-          size={50}
-        />
-      </Pressable>
+
       {!!destinationDistance &&
         !!currentDistanceDuration /*&& !destinationReached*/ && (
           <NavigationInfo
@@ -231,13 +182,32 @@ const Index = () => {
         setDestinationReached={setDestinationReached}
         setDestinationCoords={setDestinationCoords}
       />
-      <Button
-        //title="Go to Dashboard"
-        style={{ position: "absolute", top: 300, zIndex: 2 }}
-        onPress={() => router.push("/dashboard")}
+      <Pressable
+        style={{
+          position: "absolute",
+          top: 200,
+          left: 330,
+          padding: 12,
+          borderRadius: 50,
+          zIndex: 1,
+          backgroundColor: "blue",
+        }}
+        onPress={() => {
+          if (userId) {
+            router.push({
+              pathname: "/dashboard/dashboardscreen",
+            });
+          } else {
+            setModalVisible(true);
+          }
+        }}
       >
-        Go to Details
-      </Button>
+        <FontAwesomeIcon
+          icon={faCircleUser as any}
+          style={{ color: "white" }}
+          size={50}
+        />
+      </Pressable>
       <MapboxComponents
         currentLocation={currentLocation}
         setSearchComponent={setSearchComponentOn}
