@@ -73,7 +73,27 @@ export default function DashBoardScreen() {
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
               <Text>Are you sure you want to loggout?</Text>
-              <View style={{ flexDirection: "row", gap: 70, paddingTop: 15 }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  paddingTop: 15,
+                  width: 170,
+                }}
+              >
+                <Pressable
+                  style={{
+                    width: 60,
+                    alignItems: "center",
+                    padding: 12,
+                    borderRadius: 12,
+                    backgroundColor: "#ff4444",
+                    cursor: "pointer",
+                  }}
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Text style={{ color: "white" }}>No</Text>
+                </Pressable>
                 <Pressable
                   onPress={() => {
                     handleLogout();
@@ -89,25 +109,8 @@ export default function DashBoardScreen() {
                     borderColor: "black",
                     cursor: "pointer",
                   }}
-                  //style={[styles.button, styles.buttonClose]}
-                  //onPress={() => setDestinationReached(!destinationReached)}
                 >
                   <Text>Yes</Text>
-                </Pressable>
-                <Pressable
-                  style={{
-                    width: 60,
-                    alignItems: "center",
-                    padding: 12,
-                    borderRadius: 12,
-                    backgroundColor: "#ff4444",
-                    cursor: "pointer",
-                  }}
-                  onPress={() => setModalVisible(false)}
-                  //style={[styles.button, styles.buttonClose]}
-                  //onPress={() => setDestinationReached(!destinationReached)}
-                >
-                  <Text>No</Text>
                 </Pressable>
               </View>
             </View>

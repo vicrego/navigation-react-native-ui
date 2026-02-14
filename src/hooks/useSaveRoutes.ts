@@ -49,8 +49,6 @@ export const useRoutes = (
     );
     const destinationAddress =
       await destinationCoordinateToAddress(destinationCoords);
-    console.log("startingAddress: ", startingAddress);
-    console.log("destinationAddress: ", destinationAddress);
 
     const { error } = await supabase.from("saved_routes").insert([
       {

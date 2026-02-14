@@ -23,6 +23,14 @@ let publicToken = process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN;
 if (publicToken) {
   Mapbox.setAccessToken(publicToken);
 }
+
+interface HistoryRecord {
+  id: number;
+  coordinates: number[]; // ou [number, number]
+  created_at: string; // a data que vem do PostgreSQL
+  // adicione outros campos se houver
+}
+
 const Index = () => {
   //Index manages every state that will be displayed or used by shared component
   const [destinationRoute, setDestinationRoute] = useState(null);
@@ -36,7 +44,7 @@ const Index = () => {
   const [destinationReached, setDestinationReached] = useState(false);
   const [isFollowingRoute, setIsFollowingRoute] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [userId, setUserId] = useState();
+  const [userId, setUserId] = useState<any>();
 
   //Gets permission and sets coordinates based on user's location
   const currentLocation = useLocations();
@@ -74,22 +82,33 @@ const Index = () => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
+        console.log("session", session.user.id);
         console.log("User is logged in:", session.user.email);
+        setUserId(session.user.id);
         getStoredData();
       } else {
         console.log("User is logged out");
       }
     });
+    console.log("OI");
     return () => subscription.unsubscribe();
   }, []);
 
   async function getStoredData() {
     const { data } = await supabase.from("saved_routes").select();
+    console.log("Here data: ", data);
     if (data) {
-      console.log("data", data[0].created_at);
-      setUserId(data[0]?.created_at);
+      setStoredData(data);
     }
-    setStoredData(data);
+    {
+      /*
+    if (data !== undefined || data.length > 0) {
+      console.log("data", data?[0].created_at);
+      setUserId(data?[0].created_at);
+      setStoredData(data);
+    }
+*/
+    }
   }
 
   //BUTTONS
