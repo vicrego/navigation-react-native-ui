@@ -95,7 +95,6 @@ export const startingCoordinateToAddress = async (startingCoords: any) => {
 export const destinationCoordinateToAddress = async (
   destinationCoords: any,
 ) => {
-  console.log("destinationCoords: ", destinationCoords);
   try {
     const response = await axios.get(
       `https://api.mapbox.com/search/geocode/v6/reverse`,

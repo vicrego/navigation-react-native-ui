@@ -1,12 +1,12 @@
+import { useUser } from "@/src/contexts/userContext";
 import { Button, Text } from "@react-navigation/elements";
 import { FlashList } from "@shopify/flash-list";
-import { router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 
 const savedroutes = () => {
-  const { routeData } = useLocalSearchParams();
-  const parsedData = JSON.parse(routeData as string);
+  const { routeData } = useUser();
 
   return (
     <View style={styles.container}>
@@ -21,9 +21,9 @@ const savedroutes = () => {
         <Text style={{ fontWeight: "bold", fontSize: 16, alignSelf: "center" }}>
           Trip to Destination
         </Text>
-        {parsedData.length > 0 ? (
+        {routeData.length > 0 ? (
           <FlashList
-            data={parsedData}
+            data={routeData}
             renderItem={({ item }: any) => {
               console.log("item1: ", item.startingAddress);
               console.log("item2: ", item.destinationAddress);

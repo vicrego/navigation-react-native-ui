@@ -1,7 +1,8 @@
+import { useUser } from "@/src/contexts/userContext";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { Button, Text } from "@react-navigation/elements";
-import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { router } from "expo-router";
+import React, { useState } from "react";
 import {
   Modal,
   Pressable,
@@ -12,17 +13,11 @@ import {
 import { supabase } from "../../api/supabase";
 
 export default function DashBoardScreen() {
-  const params = useLocalSearchParams();
-  const [routes, setRoutes] = useState<any>([]);
+  const { userId, refreshUserData } = useUser();
+  const [userSettings, setUserSettings] = useState<any>([]);
   const [modalVisible, setModalVisible] = useState(false);
 
-  useEffect(() => {
-    const getStoredData = async () => {
-      const { data, error } = await supabase.from("saved_routes").select();
-      if (data) setRoutes(data);
-    };
-    getStoredData();
-  }, []);
+  //const { routes, userId /*, loading*/ } = useUser();
 
   const handleLogout = async () => {
     try {
@@ -39,27 +34,40 @@ export default function DashBoardScreen() {
     }
   };
 
+  {
+    /*
+  if (loading) return <ActivityIndicator />;
+*/
+  }
   return (
     <View style={styles.container}>
       <Button
-        //title="Go to Dashboard"
         style={{ position: "absolute", top: 30, left: 2, zIndex: 2 }}
         onPress={() => router.push("/")}
       >
         Back
       </Button>
-      {/* Action Menu */}
       <View style={styles.menuGrid}>
         <TouchableOpacity
           style={styles.menuButton}
           onPress={() => {
             router.push({
               pathname: "/dashboard/savedroutes",
-              params: { routeData: JSON.stringify(routes) }, // Stringify the specific row
             });
           }}
         >
           <Text>Saved Routes</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.menuButton}
+          onPress={() => {
+            router.push({
+              pathname: "/dashboard/usersettings",
+              params: { userSettingsData: JSON.stringify(userSettings) }, // Stringify the specific row
+            });
+          }}
+        >
+          <Text>Settings</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.logoutContainer}>

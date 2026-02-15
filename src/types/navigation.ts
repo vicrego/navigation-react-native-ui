@@ -9,6 +9,6 @@ export interface NavigationState {
 }
 
 export type RootStackParamList = {
-  Map: undefined; // No params needed for the main map
-  Dashboard: { refresh?: boolean }; // Optional param to trigger a reload
+  Map: undefined;
+  Dashboard: { refresh?: boolean };
 };

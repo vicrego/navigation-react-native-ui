@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import Mapbox from "@rnmapbox/maps";
 import "expo-dev-client";
 import { router } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { supabase } from "../api/supabase";
 import ArrivalModal from "../components/ArrivalModal";
@@ -13,6 +13,7 @@ import MapboxComponents from "../components/MapboxComponents";
 import NavigationInfo from "../components/NavigationInfo";
 import SearchComponent from "../components/SearchComponent";
 import SignInModal from "../components/SignInModal";
+import { useUser } from "../contexts/userContext";
 import { useCurrentRoute } from "../hooks/useCurrentRoute";
 import useLocations from "../hooks/useLocations";
 import { useRoutes } from "../hooks/useSaveRoutes";
@@ -44,7 +45,7 @@ const Index = () => {
   const [destinationReached, setDestinationReached] = useState(false);
   const [isFollowingRoute, setIsFollowingRoute] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [userId, setUserId] = useState<any>();
+  //const [userId, setUserId] = useState<any>();
 
   //Gets permission and sets coordinates based on user's location
   const currentLocation = useLocations();
@@ -75,7 +76,10 @@ const Index = () => {
     setDestinationDistance,
     setDestinationCoords,
   );
-
+  const { userId /*, loading*/ } = useUser();
+  console.log("userId Index: ", userId);
+  {
+    /*
   useEffect(() => {
     // Listen for changes (Login, Logout, Token Refresh)
     const {
@@ -93,21 +97,14 @@ const Index = () => {
     console.log("OI");
     return () => subscription.unsubscribe();
   }, []);
+  */
+  }
 
   async function getStoredData() {
     const { data } = await supabase.from("saved_routes").select();
     console.log("Here data: ", data);
     if (data) {
       setStoredData(data);
-    }
-    {
-      /*
-    if (data !== undefined || data.length > 0) {
-      console.log("data", data?[0].created_at);
-      setUserId(data?[0].created_at);
-      setStoredData(data);
-    }
-*/
     }
   }
 
