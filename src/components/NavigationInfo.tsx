@@ -1,12 +1,28 @@
 //import { Text } from '@react-navigation/elements';
 import { faLocationDot } from "@fortawesome/free-solid-svg-icons/faLocationDot";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import * as turf from "@turf/turf";
 import React, { useEffect, useRef } from "react";
 import { Animated, StyleSheet, Text, View } from "react-native";
+import { useUser } from "../contexts/userContext";
 
 const NavigationInfo = ({ placeName, currentDistanceDuration }: any) => {
   //Nav Info simply displays navigation Info to the user
-  let remainingMiles = currentDistanceDuration.remainingMiles.toFixed(2);
+  const { userSettingsData } = useUser();
+  console.log(
+    "userSettingsData?.distance_unit: ",
+    userSettingsData?.distance_unit,
+  );
+
+  const unit =
+    userSettingsData?.distance_unit === "miles" ? "miles" : "kilometers";
+
+  const remainingDistance = turf
+    .length(currentDistanceDuration.remainingLine, {
+      units: unit,
+    })
+    .toFixed(2);
+
   let remainingMinutes = currentDistanceDuration.remainingDuration;
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -44,7 +60,10 @@ const NavigationInfo = ({ placeName, currentDistanceDuration }: any) => {
             <Text style={{ fontSize: 25 }}>
               {Math.round(remainingMinutes)} min
             </Text>
-            <Text style={{ fontSize: 25 }}>{remainingMiles} mi</Text>
+            <Text style={{ fontSize: 25 }}>
+              {remainingDistance}{" "}
+              {userSettingsData?.distance_unit === "miles" ? "mi" : "km"}
+            </Text>
           </View>
         </View>
       </View>

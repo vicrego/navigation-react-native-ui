@@ -1,7 +1,6 @@
 import { supabase } from "@/src/api/supabase";
+import DashboardLayoult from "@/src/components/DashboardLayoult";
 import { useUser } from "@/src/contexts/userContext";
-import { Button } from "@react-navigation/elements";
-import { router } from "expo-router";
 import React, { useState } from "react";
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
@@ -13,16 +12,12 @@ const usersettings = () => {
   );
   const [isFocus, setIsFocus] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  console.log(
-    "userSettingsData?.distance_unit: ",
-    userSettingsData?.distance_unit,
-  );
 
   const renderLabel = () => {
     if (distanceUnit || isFocus) {
       return (
         <Text style={[styles.label, isFocus && { color: "blue" }]}>
-          Dropdown label
+          Distance Unit
         </Text>
       );
     }
@@ -47,13 +42,7 @@ const usersettings = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Button
-        style={{ position: "absolute", top: 30, left: 2, zIndex: 2 }}
-        onPress={() => router.push("/dashboard/dashboardscreen")}
-      >
-        Back
-      </Button>
+    <DashboardLayoult routerPath={"/dashboard/dashboardscreen"}>
       <View style={styles.menuGrid}>
         {renderLabel()}
         <Dropdown
@@ -76,7 +65,6 @@ const usersettings = () => {
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
           onChange={(item) => {
-            console.log("item set:", item.value);
             setDistanceUnit(item.value);
             setIsFocus(false);
           }}
@@ -137,7 +125,7 @@ const usersettings = () => {
           </View>
         </View>
       </Modal>
-    </View>
+    </DashboardLayoult>
   );
 };
 

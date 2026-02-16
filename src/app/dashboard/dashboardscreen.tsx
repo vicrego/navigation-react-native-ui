@@ -1,6 +1,9 @@
+import DashboardLayoult from "@/src/components/DashboardLayoult";
 import { useUser } from "@/src/contexts/userContext";
+import { faGear } from "@fortawesome/free-solid-svg-icons/faGear";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import { Button, Text } from "@react-navigation/elements";
+import { Text } from "@react-navigation/elements";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -40,13 +43,7 @@ export default function DashBoardScreen() {
 */
   }
   return (
-    <View style={styles.container}>
-      <Button
-        style={{ position: "absolute", top: 30, left: 2, zIndex: 2 }}
-        onPress={() => router.push("/")}
-      >
-        Back
-      </Button>
+    <DashboardLayoult routerPath={"/"}>
       <View style={styles.menuGrid}>
         <TouchableOpacity
           style={styles.menuButton}
@@ -63,10 +60,10 @@ export default function DashBoardScreen() {
           onPress={() => {
             router.push({
               pathname: "/dashboard/usersettings",
-              params: { userSettingsData: JSON.stringify(userSettings) }, // Stringify the specific row
             });
           }}
         >
+          <FontAwesomeIcon icon={faGear as any} size={15} />
           <Text>Settings</Text>
         </TouchableOpacity>
       </View>
@@ -125,7 +122,7 @@ export default function DashBoardScreen() {
           </View>
         </Modal>
       </View>
-    </View>
+    </DashboardLayoult>
   );
 }
 
@@ -154,6 +151,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     width: "45%",
     alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+    gap: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,

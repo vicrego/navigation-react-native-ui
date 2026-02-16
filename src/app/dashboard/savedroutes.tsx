@@ -1,7 +1,7 @@
+import DashboardLayoult from "@/src/components/DashboardLayoult";
 import { useUser } from "@/src/contexts/userContext";
-import { Button, Text } from "@react-navigation/elements";
+import { Text } from "@react-navigation/elements";
 import { FlashList } from "@shopify/flash-list";
-import { router } from "expo-router";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 
@@ -9,14 +9,7 @@ const savedroutes = () => {
   const { routeData } = useUser();
 
   return (
-    <View style={styles.container}>
-      <Button
-        //title="Go to Dashboard"
-        style={{ position: "absolute", top: 30, left: 2, zIndex: 2 }}
-        onPress={() => router.push("/dashboard/dashboardscreen")}
-      >
-        Back
-      </Button>
+    <DashboardLayoult routerPath={"/dashboard/dashboardscreen"}>
       <View style={styles.gridContainer}>
         <Text style={{ fontWeight: "bold", fontSize: 16, alignSelf: "center" }}>
           Trip to Destination
@@ -25,9 +18,6 @@ const savedroutes = () => {
           <FlashList
             data={routeData}
             renderItem={({ item }: any) => {
-              console.log("item1: ", item.startingAddress);
-              console.log("item2: ", item.destinationAddress);
-
               const date = new Date(item?.created_at);
               const formattedDate = date.toLocaleDateString("en-US", {
                 month: "short",
@@ -75,7 +65,7 @@ const savedroutes = () => {
           </View>
         )}
       </View>
-    </View>
+    </DashboardLayoult>
   );
 };
 

@@ -40,7 +40,6 @@ export const useRoutes = (
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    console.log("destinationCoords: ", destinationCoords);
     if (!user) return alert("Please login first!");
 
     //LOGIC FOR COORDINATES TO ADDRESS

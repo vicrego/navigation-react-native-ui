@@ -77,32 +77,9 @@ const Index = () => {
     setDestinationCoords,
   );
   const { userId /*, loading*/ } = useUser();
-  console.log("userId Index: ", userId);
-  {
-    /*
-  useEffect(() => {
-    // Listen for changes (Login, Logout, Token Refresh)
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) {
-        console.log("session", session.user.id);
-        console.log("User is logged in:", session.user.email);
-        setUserId(session.user.id);
-        getStoredData();
-      } else {
-        console.log("User is logged out");
-      }
-    });
-    console.log("OI");
-    return () => subscription.unsubscribe();
-  }, []);
-  */
-  }
 
   async function getStoredData() {
     const { data } = await supabase.from("saved_routes").select();
-    console.log("Here data: ", data);
     if (data) {
       setStoredData(data);
     }

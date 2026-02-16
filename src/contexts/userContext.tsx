@@ -69,8 +69,6 @@ export const UserProvider = ({ children }: any) => {
         .order("created_at", { ascending: false }),
       supabase.from("user_config").select().eq("user_id", userId).single(), // This turns the array into a single object automatically
     ]);
-    console.log("configRes: ", configRes);
-    console.log("routesRes: ", routesRes);
     if (routesRes.data) setRouteData(routesRes.data);
     if (configRes) setUserSettingsData(configRes.data);
 
@@ -96,7 +94,6 @@ export const UserProvider = ({ children }: any) => {
 
 export const useUser = () => {
   const context = useContext(UserContext);
-  console.log("context: ", context);
   if (context === undefined) {
     throw new Error("useUser must be used within a UserProvider");
   }
